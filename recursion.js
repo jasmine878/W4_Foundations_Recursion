@@ -18,6 +18,10 @@ function recSmallestInt() {
 
 }
 
+function fib() {
+
+}
+
 function stringify() {
 
 }
