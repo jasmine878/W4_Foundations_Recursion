@@ -377,3 +377,124 @@ describe('the function stringify', () => {
     });
   });
 });
+
+describe('search', () => {
+  it('operates on an array, takes a function and returns a boolean', () => {
+    // Note: Notice that `search` is invoked with .call, the context object is an array.
+    const result = search.call([], function () { });
+    expect(typeof result === 'boolean').toBe(true);
+  });
+
+  it('uses the provided matching function to find an element in the contextual array', () => {
+
+    // Note: the matching function is the function argument
+
+    const arr = ['yellow', 13, {}, 'something else'];
+    let result;
+
+    result = search.call(arr, function (val) {
+      return val === 13;
+    });
+    expect(result).toEqual(true); // arr contains 13
+
+    result = search.call(arr, function (val) {
+      return typeof val === 'function';
+    });
+    expect(result).toEqual(false); // arr does not contain a function
+  });
+
+  it('tests values inside nested arrays', () => {
+    let arr;
+    let result;
+
+    arr = ['a', ['b', ['c', ['d'], 'e'], 'f'], ['g'], 'h', [['i'], 'j']];
+    result = search.call(arr, val => {
+      return val === 'd';
+    });
+    expect(result).toEqual(true);
+    result = search.call(arr, val => {
+      return val === 'z';
+    });
+    expect(result).toEqual(false);
+
+    arr = [
+      [1, 2, [3, [[4], [5], [6]], 7, 8, 9, [10]]],
+      11,
+      [[12], [[13, 14]]],
+      15,
+    ];
+    result = search.call(arr, val => {
+      return val > 9;
+    });
+    expect(result).toEqual(true);
+    result = search.call(arr, val => {
+      return val % 17 === 0;
+    });
+    expect(result).toEqual(false);
+  });
+
+  it('is recursive', () => {
+    // this checks that search is invoked with .call or .apply
+    // this makes it recursive because the function is called within
+    // its code block.
+    expect(search.toString()).toMatch(/search.(call|apply)/);
+  });
+});
+
+describe('recursiveMap', () => {
+  it('returns an array', () => {
+    const valueReturned = recursiveMap([1, 2, 3, 4], num => {
+      return num * 2;
+    });
+
+    expect(Array.isArray(valueReturned)).toBe(true);
+  });
+
+  it('passes each element in the array argument to the callback function and stores the value returned in a new array', () => {
+    expect(
+      recursiveMap([1, 2, 3, 4], num => {
+        return num * 2;
+      })
+    ).toEqual([2, 4, 6, 8]);
+
+    expect(
+      recursiveMap(['keep', 'practicing', 'recursion'], str => {
+        return str.toUpperCase();
+      })
+    ).toEqual(['KEEP', 'PRACTICING', 'RECURSION']);
+  });
+
+  it('maps over nested arrays and includes the values from the nested arrays in the final array returned from recursiveMap', () => {
+    expect(
+      recursiveMap([1, 2, [3, 4], [5, 6]], num => {
+        return num * 2;
+      })
+    ).toEqual([2, 4, 6, 8, 10, 12]);
+
+    expect(
+      recursiveMap([
+        'ab',
+        'cd',
+        ['ef', 'gh', ['ij', 'kl', 'mn'], 'op'],
+        'qr',
+        'st',
+      ], str => str.toUpperCase())
+    ).toEqual(['AB', 'CD', 'EF', 'GH', 'IJ', 'KL', 'MN', 'OP', 'QR', 'ST']);
+  });
+
+  it('does not use Array.prototype.map', () => {
+    spyOn(Array.prototype, 'map').and.callThrough();
+
+    recursiveMap([1, 2, 3, 4], num => num + 2);
+
+    expect(Array.prototype.map.calls.count()).toBe(0);
+  })
+
+  it('calls itself recursively', () => {
+    spyOn(window, 'recursiveMap').and.callThrough();
+
+    recursiveMap([1, 2, 3, 4], num => num + 2);
+
+    expect(recursiveMap.calls.count()).toBeGreaterThan(1);
+  })
+});

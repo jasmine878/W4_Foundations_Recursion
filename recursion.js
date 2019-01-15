@@ -2,6 +2,8 @@
 // their arguments! Keep in mind, there are a few test specs that require functions that are not solved
 // recursively (you need to define those functions on your own).
 
+/* eslint-disable no-unused-vars */
+
 function factorial() {
 
 }
@@ -23,5 +25,13 @@ function fib() {
 }
 
 function stringify() {
+
+}
+
+function search() {
+
+}
+
+function recursiveMap() {
 
 }
