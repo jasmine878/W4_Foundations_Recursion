@@ -170,6 +170,7 @@ describe('recursive fibonacci', () => {
     expect(fib(1)).toEqual(1);
   });
   it('correctly computes the third fibonacci number', () => {
+    // expect(fib(6)).toEqual(13);
     expect(fib(2)).toEqual(2);
   });
   it('correctly computes the 23rd fibonacci number', () => {
